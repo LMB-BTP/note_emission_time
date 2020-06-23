@@ -1401,19 +1401,18 @@ sap.ui.define([
 		onPressDownload: function (oControlEvent) {
 
 			var oJsonModel = this.getView().getModel("displayData");
-			var aCols, aPlants, oSettings, oSheet;
 
-			aCols = this.columnConfigForDonwload(oJsonModel);
-			aPlants = oJsonModel.getProperty("/TableContent");
+			var aCols = this.columnConfigForDonwload(oJsonModel);
+			var aPlants = oJsonModel.getProperty("/TableContent");
 
-			oSettings = {
+			var oSettings = {
 				workbook: {
 					columns: aCols
 				},
 				dataSource: aPlants
 			};
 
-			oSheet = new Spreadsheet(oSettings);
+			var oSheet = new Spreadsheet(oSettings);
 			oSheet.build()
 				.then(function () {
 					MessageToast.show("Download Concluído com sucesso");

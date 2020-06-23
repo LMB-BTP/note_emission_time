@@ -1396,7 +1396,7 @@ sap.ui.define([
 
 		/*----------------------------------------------------
 		Function: onPressDownload
-		Target: Download Content as Excel
+		Target: Download Content as Excel 
 		----------------------------------------------------*/
 		onPressDownload: function (oControlEvent) {
 

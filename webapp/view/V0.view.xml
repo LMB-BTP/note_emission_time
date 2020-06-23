@@ -16,14 +16,6 @@
 							<HBox id="TableVBox"/>
 						</Panel>
 						<VBox id="ChartVBox"/>
-						<!--<FlexBox id="ChartVBox" height="70%" fitContainer="true" justifyContent="Center"/>-->
-						<!--<layout:BlockLayout id="BlockLayout2">-->
-						<!--	<layout:BlockLayoutRow accentCells="Accent1">-->
-						<!--		<layout:BlockLayoutCell>-->
-						<!--			<HBox id="ChartVBox"/>-->
-						<!--		</layout:BlockLayoutCell>-->
-						<!--	</layout:BlockLayoutRow>-->
-						<!--</layout:BlockLayout>-->
 					</content>
 				</Page>
 			</pages>

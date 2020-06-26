@@ -5,12 +5,12 @@
 			<pages>
 				<Page id="page" title="{i18n>title}">
 					<content>
-						<Panel expandable="true" expanded="true">
+						<Panel expandable="true" expanded="true" busy="{displayData>/Settings/panelBusy}">
 							<headerToolbar>
 								<OverflowToolbar height="3rem" style="Clear">
 									<Label text="{i18n>panelHeaderText}" />
 									<ToolbarSpacer/>
-									<Button icon="sap-icon://download-from-cloud" tooltip="Download" press="onPressDownload"/>
+									<Button icon="sap-icon://download-from-cloud" tooltip="{i18n>buttDownloadTooTip}" press="_onPressDownload"/>
 								</OverflowToolbar>
 							</headerToolbar>
 							<HBox id="TableVBox"/>

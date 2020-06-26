@@ -1,5 +1,5 @@
 function initModel() {
-	var sUrl = "/ODataOrg/V2/OData/OData.svc/";
+	var sUrl = "/SCP_HANA/LMB_CONSUME/oData/NoteEmissionTime.xsodata/";
 	var oModel = new sap.ui.model.odata.ODataModel(sUrl, true);
 	sap.ui.getCore().setModel(oModel);
 }

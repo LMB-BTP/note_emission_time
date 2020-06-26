@@ -4,863 +4,193 @@ sap.ui.define([
 	"sap/ui/table/Table",
 	"sap/viz/ui5/controls/VizFrame",
 	"sap/ui/export/Spreadsheet",
-	"sap/m/MessageToast"
-], function (Controller, JSONModel, Table, VizFrame, Spreadsheet, MessageToast) {
+	"sap/m/MessageToast",
+	"sap/m/MessageBox"
+], function (Controller, JSONModel, Table, VizFrame, Spreadsheet, MessageToast, MessageBox) {
 	"use strict";
 
 	return Controller.extend("LMBR_CUSTOMER_APP.note_emission_time.controller.V0", {
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// Get data from BackEnd Service
+		// Format Period
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
+		_formatPeriod: function (input) {
+			var vOutput = "";
+			var vYear = input.substring(2, 4);
+			var vMonth = input.substring(4, 6);
+
+			switch (vMonth) {
+
+			case "01":
+				vOutput = "Jan-" + vYear;
+				break;
+			case "02":
+				vOutput = "Fev-" + vYear;
+				break;
+			case "03":
+				vOutput = "Mar-" + vYear;
+				break;
+			case "04":
+				vOutput = "Abr-" + vYear;
+				break;
+			case "05":
+				vOutput = "Mai-" + vYear;
+				break;
+			case "06":
+				vOutput = "Jun-" + vYear;
+				break;
+			case "07":
+				vOutput = "Jul-" + vYear;
+				break;
+			case "08":
+				vOutput = "Ago-" + vYear;
+				break;
+			case "09":
+				vOutput = "Set-" + vYear;
+				break;
+			case "10":
+				vOutput = "Out-" + vYear;
+				break;
+			case "11":
+				vOutput = "Nov-" + vYear;
+				break;
+			case "12":
+				vOutput = "Dez-" + vYear;
+				break;
+			}
+
+			return vOutput;
+		},
+
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		_get_backend_data: function (oJsonModel) {
+		// Remove duplicated records from Array informed
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
+		_removeDuplicates: function (originalArray, prop) {
+			var newArray = [];
+			var lookupObject = {};
 
-			// // Default Model (OData Model)
-			// var oModel = this.getView().getModel();
+			for (var i in originalArray) {
 
-			// // Callback para SUCCESS
-			// function onSuccess(oData, response) {
-
-			// 	// New Property for TableData
-			// 	oJsonModel.setProperty("/TableData/Table", oData.results);
-
-			// 	// Disable Busy Indicator
-			// 	oJsonModel.setProperty("/TableData/BusyIndicator", false);
-
-			// 	console.log("Sucesso em pesquisar os dados");
-			// }
-
-			// // Callback para ERROR
-			// function onError(oError) {
-
-			// 	// Compose Message
-			// 	var vMsg = this.getView().getModel("i18n").getProperty("MessageSelectedDataError") + oError.responseText;
-
-			// 	MessageToast.show((vMsg), {
-			// 		duration: 500,
-			// 		at: "sap.ui.core.Popup.Dock.CenterCenter"
-			// 	});
-			// 	console.log("Erro na pesquisa dos dados do BackEnd");
-
-			// 	// Disable Busy Indicator
-			// 	oJsonModel.setProperty("/TableData/BusyIndicator", false);
-			// }
-
-			// // Parameters
-			// var oParam = {
-			// 	success: onSuccess.bind(this),
-			// 	error: onError.bind(this)
-			// };
-
-			// // Enable Busy Indicator
-			// oJsonModel.setProperty("/TableData/BusyIndicator", false);
-
-			// // Get BlockUsers Content
-			// oModel.read("/Products", oParam);
-
-			// BackEnd Table Data
-			var _tempData = [{
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_06",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_06",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_06",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_05",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_05",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_05",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_04",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_04",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_04",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_06",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_06",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_06",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_05",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_05",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_05",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_04",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_04",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_04",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_06",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_06",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_06",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_05",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_05",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_05",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_04",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_04",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_04",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_06",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_06",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_06",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_05",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_05",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_05",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_04",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_04",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_04",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_06",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_06",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_06",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_05",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_05",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_05",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_04",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_04",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_04",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_03",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_03",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_03",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_02",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_02",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_02",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0001",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0001",
-				period: "2020_01",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0002",
-				categ: "A",
-				region: "SP",
-				name: "Loja 0002",
-				period: "2020_01",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0003",
-				categ: "B",
-				region: "SP",
-				name: "CD 0003",
-				period: "2020_01",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_03",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_03",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_03",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_02",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_02",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_02",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0004",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0004",
-				period: "2020_01",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0005",
-				categ: "A",
-				region: "MG",
-				name: "Loja 0005",
-				period: "2020_01",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0006",
-				categ: "B",
-				region: "MG",
-				name: "CD 0006",
-				period: "2020_01",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_03",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_03",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_03",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_02",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_02",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_02",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0007",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0007",
-				period: "2020_01",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0008",
-				categ: "A",
-				region: "PR",
-				name: "Loja 0008",
-				period: "2020_01",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0009",
-				categ: "B",
-				region: "PR",
-				name: "CD 0009",
-				period: "2020_01",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_03",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_03",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_03",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_02",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_02",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_02",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0010",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0010",
-				period: "2020_01",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0011",
-				categ: "A",
-				region: "RJ",
-				name: "Loja 0011",
-				period: "2020_01",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0012",
-				categ: "B",
-				region: "RJ",
-				name: "Loja 0012",
-				period: "2020_01",
-				qty: 44209,
-				time: 87
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_03",
-				qty: 30250,
-				time: 55
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_03",
-				qty: 32048,
-				time: 60
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_03",
-				qty: 29092,
-				time: 90
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_02",
-				qty: 28209,
-				time: 78
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_02",
-				qty: 23098,
-				time: 59
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_02",
-				qty: 10923,
-				time: 48
-			}, {
-				plant: "0013",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0013",
-				period: "2020_01",
-				qty: 12399,
-				time: 44
-			}, {
-				plant: "0014",
-				categ: "A",
-				region: "SC",
-				name: "Loja 0014",
-				period: "2020_01",
-				qty: 20932,
-				time: 49
-			}, {
-				plant: "0015",
-				categ: "B",
-				region: "SC",
-				name: "Loja 0015",
-				period: "2020_01",
-				qty: 44209,
-				time: 87
-			}];
-
-			for (var i = 0; i < _tempData.length; i++) {
-				_tempData[i].qty = Math.floor(Math.random() * 500) + 500;
-				_tempData[i].time = Math.floor(Math.random() * 30) + 30;
-			}
-			oJsonModel.setProperty("/BackEndTableData", _tempData);
-
-			function removeDuplicates(originalArray, prop) {
-				var newArray = [];
-				var lookupObject = {};
-
-				for (var i in originalArray) {
+				// If 'prop' is not informed, ckeck all record
+				if (prop)
 					lookupObject[originalArray[i][prop]] = originalArray[i];
-				}
-
-				for (i in lookupObject) {
-					newArray.push(lookupObject[i]);
-				}
-				return newArray;
+				else
+					lookupObject[originalArray[i]] = originalArray[i];
 			}
 
-			// Get Unique Occurrence for PLANT field
-			var uniqueArrayPlant = removeDuplicates(_tempData, "plant");
-			oJsonModel.setProperty("/BackEndTableDataByPlant", uniqueArrayPlant);
+			for (i in lookupObject) {
+				newArray.push(lookupObject[i]);
+			}
+			return newArray;
+		},
 
-			// Get Unique Occurrence for PERIOD field
-			var uniqueArrayPeriod = removeDuplicates(_tempData, "period");
-			oJsonModel.setProperty("/BackEndTableDataByPeriod", uniqueArrayPeriod);
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// Default Settings
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
+		_defaultSettings: function (oJsonModel) {
 
-			// Run for PLANT
+			var oSettings = {};
+
+			// Get YYYYMM fo Current Date
+			var vTodayTo = new Date();
+			var vDateTo = vTodayTo.getFullYear() +
+				("00" + (vTodayTo.getMonth() + 1)).slice(-2);
+
+			// Get YYYYMM fo Current Date subtrating 5 months
+			var vTodayFrom = vTodayTo;
+			vTodayFrom.setMonth(vTodayTo.getMonth() - 5);
+			var vDateFrom = vTodayFrom.getFullYear() +
+				("00" + (vTodayFrom.getMonth() + 1)).slice(-2);
+
+			var result = {};
+			result.dateFrom = vDateFrom;
+			result.dateTo = vDateTo;
+
+			// Activate Busy Control for Panel			
+			oSettings.panelBusy = true;
+
+			// Date From and Date TO
+			oSettings.dateFrom = vDateFrom;
+			oSettings.dateTo = vDateTo;
+
+			oJsonModel.setProperty("/Settings", oSettings);
+
+		},
+
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// Fill Dynamic Content From OData
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
+		_fillDynamicContentFromOData: function (oArrayResults, oJsonModel) {
+
+			// Get Unique Occurrence for PLANT field, generating new Array
+			var uniquePlantArray = [];
+			var internalPlantArray = this._removeDuplicates(oArrayResults, "Plant");
+			for (var i = 0; i < internalPlantArray.length; i++)
+				uniquePlantArray.push(internalPlantArray[i]['Plant']);
+			oJsonModel.setProperty("/BackEndTableDataByPlant", uniquePlantArray);
+
+			// Get Unique Occurrence for PERIOD field, generating new Array
+			var uniquePeriodArray = [];
+			var internalPeridArray = this._removeDuplicates(oArrayResults, "Period");
+			for (i = 0; i < internalPeridArray.length; i++)
+				uniquePeriodArray.push(this._formatPeriod(internalPeridArray[i]['Period']));
+			oJsonModel.setProperty("/BackEndTableDataByPeriod", uniquePeriodArray);
+
+			/* Run for PLANT and generate a Array with records with Fields:
+			- plant:  Plant
+			- categ:  Plant Category
+			- region: Region
+			- name:   Plant Description
+			- YYYY-MM_qty  : Period Quantity
+			- YYYY-MM-time : Period Average Time
+			- Average Time     */
 			var newArray = [];
 			var dynColumns = [];
 			var dynColumnsQty = [];
 			var dynColumnsTime = [];
-			for (var i = 0; i < uniqueArrayPlant.length; i++) {
+			for (i = 0; i < internalPlantArray.length; i++) {
 
 				// New Element for Array
 				var newElement = {};
-				newElement['plant'] = uniqueArrayPlant[i].plant;
-				newElement['categ'] = uniqueArrayPlant[i].categ;
-				newElement['region'] = uniqueArrayPlant[i].region;
-				newElement['name'] = uniqueArrayPlant[i].name;
+				newElement['plant'] = internalPlantArray[i]['Plant'];
+				newElement['categ'] = internalPlantArray[i]['PlantCateg'];
+				newElement['region'] = internalPlantArray[i]['Region'];
+				newElement['name'] = internalPlantArray[i]['Name'];
 
 				// Run for PERIOD
-				for (var j = 0; j < uniqueArrayPeriod.length; j++) {
+				for (var j = 0; j < internalPeridArray.length; j++) {
 
 					// Search Record on Array
 					var result = {};
-					for (var k = 0; k < _tempData.length; k++) {
-						if (_tempData[k].plant === uniqueArrayPlant[i].plant &&
-							_tempData[k].period === uniqueArrayPeriod[j].period) {
-							result = _tempData[k];
+					for (var k = 0; k < oArrayResults.length; k++) {
+						if (oArrayResults[k]['Plant'] === internalPlantArray[i]['Plant'] &&
+							this._formatPeriod(oArrayResults[k]['Period']) === this._formatPeriod(internalPeridArray[j]['Period'])) {
+							result = oArrayResults[k];
 							break;
 						}
 					}
 
 					// Fill Dynamic for QUANTITY
 					var dynQty = 0;
-					if (result.hasOwnProperty("qty"))
-						dynQty = result.qty;
-					var fieldForQty = uniqueArrayPeriod[j].period + "_qty";
+					if (result.hasOwnProperty("Qty"))
+						dynQty = result["Qty"];
+					var fieldForQty = this._formatPeriod(internalPeridArray[j].Period) + "-qty";
 					newElement[fieldForQty] = dynQty;
+
+					// Insert Dynamic Collumns (QTY)
+					dynColumns.push(fieldForQty);
+					dynColumnsQty.push(fieldForQty);
 
 					// Fill Dynamic for TIME
 					var dynTime = 0;
-					if (result.hasOwnProperty("time"))
-						dynTime = result.time;
-					var fieldForTime = uniqueArrayPeriod[j].period + "_time";
+					if (result.hasOwnProperty("AvgTime"))
+						dynTime = result["AvgTime"];
+					var fieldForTime = this._formatPeriod(internalPeridArray[j].Period) + "-time";
 					newElement[fieldForTime] = dynTime;
 
-					// Insert Dynamic Collumns (QTY)
-					var newCollumnQty = {};
-					newCollumnQty.name = fieldForQty;
-					dynColumns.push(newCollumnQty);
-					dynColumnsQty.push(newCollumnQty);
-
 					// Insert Dynamic Collumns (TIME)
-					var newCollumnTime = {};
-					newCollumnTime.name = fieldForTime;
-					dynColumns.push(newCollumnTime);
-					dynColumnsTime.push(newCollumnTime);
+					dynColumns.push(fieldForTime);
+					dynColumnsTime.push(fieldForTime);
 				}
 
 				// Fill new Record
@@ -868,19 +198,74 @@ sap.ui.define([
 			}
 
 			// Set Dynamic collumns (ALL)
-			dynColumns = removeDuplicates(dynColumns, "name");
+			dynColumns = this._removeDuplicates(dynColumns);
 			oJsonModel.setProperty("/DynCollumns", dynColumns);
 
 			// Set Dynamic collumns (QTY)
-			dynColumnsQty = removeDuplicates(dynColumnsQty, "name");
+			dynColumnsQty = this._removeDuplicates(dynColumnsQty);
 			oJsonModel.setProperty("/DynCollumnsQty", dynColumnsQty);
 
 			// Set Dynamic collumns (TIME)
-			dynColumnsTime = removeDuplicates(dynColumnsTime, "name");
+			dynColumnsTime = this._removeDuplicates(dynColumnsTime);
 			oJsonModel.setProperty("/DynCollumnsTime", dynColumnsTime);
 
 			// Set Table Content for Grid Table Display
 			oJsonModel.setProperty("/TableContent", newArray);
+
+			// Generate Dynamic Table on VBOX
+			this._dynamicViewTable(oJsonModel);
+
+		},
+
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// Get data from BackEnd Service
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		_get_backend_data: function (oJsonModel, oDataModel) {
+
+			// Set Default Settings
+			this._defaultSettings(oJsonModel);
+
+			var self = this;
+
+			// Callback para SUCCESS
+			function onSuccess(oData, response) {
+
+				// New Property for TableData
+				oJsonModel.setProperty("/BackEndTableData", oData.results);
+
+				// Fill Content from OData Service
+				self._fillDynamicContentFromOData(oData.results, oJsonModel);
+
+				// Desativate Busy Control
+				var oSettings = oJsonModel.getProperty("/Settings");
+				oSettings.panelBusy = false;
+				oJsonModel.setProperty("/Settings", oSettings);
+
+				console.log("===> Sucess on OData Read");
+
+			}
+
+			// Callback para ERROR
+			function onError(oError) {
+
+				// Compose Message
+				var vMsg = this.getView().getModel("i18n").getProperty("MessageSelectedDataError") + oError.responseText;
+
+				MessageBox.error(vMsg);
+				console.log("===> Error on OData Read");
+
+			}
+
+			// Parameters
+			var oParam = {
+				success: onSuccess.bind(this),
+				error: onError.bind(this)
+			};
+
+			// Fill Path to READ OData Service, filling DateFrom and DateTo content
+			var oSettings = oJsonModel.getProperty("/Settings");
+			var vPath = "/P(IP_Date_From='" + oSettings.dateFrom + "',IP_Date_To='" + oSettings.dateTo + "')/Results?$format=json";
+			oDataModel.read(vPath, oParam);
 
 		},
 
@@ -892,13 +277,30 @@ sap.ui.define([
 			// Reference of Controller
 			var _self = this;
 
+			// Visible Row Cound Control
+			var visibleRowCount = 0;
+			if (oJsonModel.getProperty("/TableContent").length > 15)
+				visibleRowCount = 15;
+			else
+				visibleRowCount = oJsonModel.getProperty("/TableContent").length;
+
 			// Generate New Table
 			var oTable = new Table("GridTable", {
 				selectionMode: "MultiToggle",
-				visibleRowCount: oJsonModel.getProperty("/TableContent").length, // Quantity of Lines Already to avoid ScroolBar
+				visibleRowCount: visibleRowCount,
 				enableSelectAll: true,
 				alternateRowColors: true
 			});
+			
+			// Add Extension (Button)
+			oTable.addExtension(new sap.m.Button("ResetSelection", {
+				icon: "sap-icon://reset",
+				tooltip: "{i18n>buttResetSelectionTooTip}",
+
+				press: function (oEvent) {
+					_self._onPressResetSelection(oEvent);
+				}
+			}));
 
 			// Column for "PLANTS"
 			var oTextPlant = new sap.m.Text({
@@ -907,7 +309,7 @@ sap.ui.define([
 			});
 			var oCol1 = new sap.ui.table.Column().setTemplate(oTextPlant);
 			oCol1.setAutoResizable(true);
-			oCol1.setWidth("5rem");
+			oCol1.setWidth("4.5rem");
 			oCol1.setSortProperty("plant");
 			oCol1.setFilterProperty("plant");
 			oCol1.setShowFilterMenuEntry(true);
@@ -925,7 +327,7 @@ sap.ui.define([
 			});
 			var oCol2 = new sap.ui.table.Column().setTemplate(oTextCateg);
 			oCol2.setAutoResizable(true);
-			oCol2.setWidth("5rem");
+			oCol2.setWidth("4rem");
 			oCol2.setSortProperty("categ");
 			oCol2.setFilterProperty("categ");
 			oCol2.setShowFilterMenuEntry(true);
@@ -942,7 +344,7 @@ sap.ui.define([
 			});
 			var oCol3 = new sap.ui.table.Column().setTemplate(oTextName);
 			oCol3.setAutoResizable(true);
-			oCol3.setWidth("5rem");
+			oCol3.setWidth("16rem");
 			oCol3.setSortProperty("name");
 			oCol3.setFilterProperty("name");
 			oCol3.setShowFilterMenuEntry(true);
@@ -959,7 +361,7 @@ sap.ui.define([
 			});
 			var oCol4 = new sap.ui.table.Column().setTemplate(oTextRegion);
 			oCol4.setAutoResizable(true);
-			oCol4.setWidth("7rem");
+			oCol4.setWidth("4rem");
 			oCol4.setSortProperty("region");
 			oCol4.setFilterProperty("region");
 			oCol4.setShowFilterMenuEntry(true);
@@ -969,30 +371,9 @@ sap.ui.define([
 			}));
 			oTable.addColumn(oCol4);
 
-			// var dynCollumns = oJsonModel.getProperty("/DynCollumns");
-			// for (var i = 0; i < dynCollumns.length; i++) {
-
-			// 	// Column for "DynCollumns"
-			// 	var textProp = "{displayData>" + dynCollumns[i].name + "}";
-			// 	var oTextDyn = new sap.m.Text({
-			// 		text: textProp
-			// 	});
-			// 	var oColDyn = new sap.ui.table.Column().setTemplate(oTextDyn);
-			// 	oColDyn.setAutoResizable(true);
-			// 	oColDyn.setWidth("7rem");
-			// 	oColDyn.setSortProperty(dynCollumns[i].name);
-			// 	oColDyn.setFilterProperty(dynCollumns[i].name);
-			// 	oColDyn.setShowFilterMenuEntry(true);
-			// 	oColDyn.setShowSortMenuEntry(true);
-			// 	oColDyn.setLabel(new sap.m.Label({
-			// 		text: dynCollumns[i].name
-			// 	}));
-			// 	oTable.addColumn(oColDyn);
-			// }
-
 			// Save Controller for internal reference
 			oTable.attachRowSelectionChange(function (oEvent) {
-				_self.onRowSelectionChange(oEvent);
+				_self._onRowSelectionChange(oEvent);
 			});
 			oTable.bindRows("displayData>/TableContent");
 
@@ -1046,6 +427,7 @@ sap.ui.define([
 			var measureAxisArray = [];
 			for (var i = 0; i < _selectedLines.length; i++) {
 
+				// Get record based on selected index
 				var selectedLine = oJsonModel.getProperty(
 					oTable.getContextByIndex(_selectedLines[i]).sPath);
 
@@ -1248,26 +630,9 @@ sap.ui.define([
 		},
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// Standard Event :: onInit
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		onInit: function () {
-
-			// Generate new JSON Model for DisplayData
-			var oJsonModel = new JSONModel();
-			this.getView().setModel(oJsonModel, "displayData");
-
-			// Get Data from BackEnd
-			this._get_backend_data(oJsonModel);
-
-			// Generate Dynamic Table on VBOX
-			this._dynamicViewTable(oJsonModel);
-
-		},
-
-		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		// Fill Dynamic Content
+		// Fill Dynamic Content for Chart
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++		
-		_fillDynamicContent: function (oTable, oJsonModel) {
+		_fillDynamicContentForChart: function (oTable, oJsonModel) {
 
 			// Array Temporário
 			var oTempArray = [];
@@ -1284,7 +649,7 @@ sap.ui.define([
 			for (var i = 0; i < _byPerid.length; i++) {
 
 				var tempElement = {};
-				tempElement["period"] = _byPerid[i].period;
+				tempElement["period"] = _byPerid[i];
 
 				// Run All Selected Lines
 				for (var j = 0; j < _selectedLines.length; j++) {
@@ -1295,19 +660,19 @@ sap.ui.define([
 					// For QUANTITY (Field name will be 'qtyxxxx' )
 					for (var k = 0; k < dynColumnsQty.length; k++) {
 
-						if (!dynColumnsQty[k].name.includes(_byPerid[i].period))
+						if (!dynColumnsQty[k].includes(_byPerid[i]))
 							continue;
 
-						tempElement["qty" + selectedLine["plant"]] = selectedLine[dynColumnsQty[k].name];
+						tempElement["qty" + selectedLine["plant"]] = selectedLine[dynColumnsQty[k]];
 					}
 
 					// For TIME (Field name will be 'timexxxx' )
 					for (k = 0; k < dynColumnsTime.length; k++) {
 
-						if (!dynColumnsTime[k].name.includes(_byPerid[i].period))
+						if (!dynColumnsTime[k].includes(_byPerid[i]))
 							continue;
 
-						tempElement["time" + selectedLine["plant"]] = selectedLine[dynColumnsTime[k].name];
+						tempElement["time" + selectedLine["plant"]] = selectedLine[dynColumnsTime[k]];
 					}
 
 				}
@@ -1326,7 +691,7 @@ sap.ui.define([
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// Customer Event for Table :: On rowSelectionChange Event
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		onRowSelectionChange: function (oControlEvent) {
+		_onRowSelectionChange: function (oControlEvent) {
 
 			// Json Model
 			var oJsonModel = this.getView().getModel("displayData");
@@ -1335,7 +700,7 @@ sap.ui.define([
 			var _oTable = oControlEvent.getSource();
 
 			// Fill Dynamic Content
-			this._fillDynamicContent(_oTable, oJsonModel);
+			this._fillDynamicContentForChart(_oTable, oJsonModel);
 
 			// Generate Dynamic Chart on VBOX
 			this._dynamicViewChart(_oTable, oJsonModel);
@@ -1345,7 +710,7 @@ sap.ui.define([
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		// Fill Collumns for Excel Export
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		columnConfigForDonwload: function (oJsonModel) {
+		_columnConfigForDonwload: function (oJsonModel) {
 			var array = [];
 
 			// Plants
@@ -1384,10 +749,10 @@ sap.ui.define([
 			var aDynCols = oJsonModel.getProperty("/DynCollumns");
 			for (var i = 0; i < aDynCols.length; i++) {
 				element = {};
-				element.label    = aDynCols[i].name;
-				element.property = aDynCols[i].name;
-				element.type     = "Number";
-				element.width    = 10;
+				element.label = aDynCols[i];
+				element.property = aDynCols[i];
+				element.type = "Number";
+				element.width = 10;
 				array.push(element);
 			}
 
@@ -1395,16 +760,31 @@ sap.ui.define([
 		},
 
 		/*----------------------------------------------------
-		Function: onPressDownload
+		Function: _onPressResetSelection
 		Target: Download Content as Excel 
 		----------------------------------------------------*/
-		onPressDownload: function (oControlEvent) {
+		_onPressResetSelection: function (oControlEvent) {
 
+			// Get Table
+			var _oTable = oControlEvent.getSource().getParent();
+			_oTable.clearSelection();
+
+		},
+
+		/*----------------------------------------------------
+		Function: _onPressDownload
+		Target: Download Content as Excel 
+		----------------------------------------------------*/
+		_onPressDownload: function (oControlEvent) {
+
+			// Get Json Model
 			var oJsonModel = this.getView().getModel("displayData");
 
-			var aCols = this.columnConfigForDonwload(oJsonModel);
+			// Define Collumns to Spreadsheet
+			var aCols = this._columnConfigForDonwload(oJsonModel);
 			var aPlants = oJsonModel.getProperty("/TableContent");
 
+			// Define Settings
 			var oSettings = {
 				workbook: {
 					columns: aCols
@@ -1414,10 +794,28 @@ sap.ui.define([
 
 			var oSheet = new Spreadsheet(oSettings);
 			oSheet.build()
-				.then(function () {
-					MessageToast.show("Download Concluído com sucesso");
+				.then()
+				.catch(function (sMessage) {
+					MessageToast.show("Export Error: " + sMessage);
 				})
 				.finally(oSheet.destroy);
+
+		},
+
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		// Standard Event :: onInit
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		onInit: function () {
+
+			// Generate new JSON Model for DisplayData
+			var oJsonModel = new JSONModel();
+			this.getView().setModel(oJsonModel, "displayData");
+
+			// Default Model (OData Model)
+			var oDataModel = this.getView().getModel("hanaData");
+
+			// Get Data from BackEnd
+			this._get_backend_data(oJsonModel, oDataModel);
 
 		}
 	});

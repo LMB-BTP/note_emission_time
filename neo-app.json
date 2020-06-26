@@ -29,12 +29,12 @@
       "description": "SAPUI5 Resources"
     },
     {
-      "path": "/destinations/ODataOrg",
+      "path": "/destinations/SCP_HANA",
       "target": {
         "type": "destination",
-        "name": "ODataOrg"
+        "name": "SCP_HANA"
       },
-      "description": "ODataOrg Services"
+      "description": "SCP_HANA Services"
     },
     {
       "path": "/webapp/test-resources",
@@ -46,12 +46,12 @@
       "description": "SAPUI5 Test Resources"
     },
     {
-      "path": "/ODataOrg",
+      "path": "/SCP_HANA",
       "target": {
         "type": "destination",
-        "name": "ODataOrg"
+        "name": "SCP_HANA"
       },
-      "description": "ODataOrg"
+      "description": "SCP_HANA"
     }
   ],
   "sendWelcomeFileRedirect": true

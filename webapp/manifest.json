@@ -14,11 +14,11 @@
 			"version": "0.0.0"
 		},
 		"dataSources": {
-			"OData.svc": {
-				"uri": "/ODataOrg/V2/OData/OData.svc/",
+			"NoteEmissionTime.xsodata": {
+				"uri": "/SCP_HANA/LMB_CONSUME/oData/NoteEmissionTime.xsodata/",
 				"type": "OData",
 				"settings": {
-					"localUri": "localService/metadata.xml"
+					"localUri": "localService/NoteEmissionTime.xsodata/metadata.xml"
 				}
 			}
 		}
@@ -66,7 +66,7 @@
 					"bundleName": "LMBR_CUSTOMER_APP.note_emission_time.i18n.i18n"
 				}
 			},
-			"": {
+			"hanaData": {
 				"type": "sap.ui.model.odata.v2.ODataModel",
 				"settings": {
 					"defaultOperationMode": "Server",
@@ -74,7 +74,7 @@
 					"defaultCountMode": "Request",
 					"useBatch": true
 				},
-				"dataSource": "OData.svc",
+				"dataSource": "NoteEmissionTime.xsodata",
 				"preload": true
 			}
 		},
